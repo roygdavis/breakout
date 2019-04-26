@@ -11,7 +11,8 @@ export interface CanvasState {
     balls: Array<BallProps>,
     bricks: Array<BrickProps>,
     gameOver: boolean,
-    intervalId: any
+    intervalId: any,
+    score: number
 }
 
 class Canvas extends React.Component<CanvasProps, CanvasState> {
@@ -31,7 +32,8 @@ class Canvas extends React.Component<CanvasProps, CanvasState> {
             balls: balls,
             gameOver: false,
             intervalId: null,
-            bricks: bricks
+            bricks: bricks,
+            score: 0
         };
     }
 
@@ -110,11 +112,15 @@ class Canvas extends React.Component<CanvasProps, CanvasState> {
 
     handleBrickHit = (brick: BrickProps) => {
         //console.log(brick);
-        const { bricks } = this.state;
+        let { bricks, score } = this.state;
         const b = bricks.find(b => b.id === brick.id);
         b!.power -= 0.2;
-        if (b!.power < 0) b!.power = 0;
-        this.setState({ bricks: bricks.filter(br => br.power !== 0) });
+        score += 50;
+        if (b!.power < 0) {
+            b!.power = 0;
+            score += 100;
+        }
+        this.setState({ bricks: bricks.filter(br => br.power !== 0), score });
     }
 
     gameOver = () => {
@@ -124,12 +130,14 @@ class Canvas extends React.Component<CanvasProps, CanvasState> {
     }
 
     render() {
-        const { paddleXPos, balls, bricks } = this.state;
+        const { paddleXPos, balls, bricks, score } = this.state;
         return (
             <svg viewBox="0 0 1000 800" xmlns="http://www.w3.org/2000/svg">
+
                 <Paddle xPos={paddleXPos} yPos={this.paddleYPos} width={this.paddleWidth} height={this.paddleHeight}></Paddle>
                 {balls.map(b => <Ball key={b.id} {...b} paddleXPos={paddleXPos} bricks={bricks} brickHit={(brick: BrickProps) => this.handleBrickHit(brick)} />)}
                 {bricks.map(k => <Brick key={k.id} {...k}></Brick>)}
+                <text x="500" y="20">{score}</text>
             </svg>);
     }
 }
