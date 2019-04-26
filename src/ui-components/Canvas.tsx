@@ -16,6 +16,7 @@ export interface CanvasState {
 
 class Canvas extends React.Component<CanvasProps, CanvasState> {
     initialPaddleXPos = 500;
+    paddleYPos = 400;
     numberOfBalls = 50;
     paddleWidth = 150;
     paddleHeight = 20;
@@ -49,6 +50,7 @@ class Canvas extends React.Component<CanvasProps, CanvasState> {
                 ballGoingLeft: Math.round(Math.random()) === 1,
                 speed: Math.random() * 100,
                 paddleXPos: this.initialPaddleXPos,
+                paddleYPos: this.paddleYPos,
                 ballLostEvent: this.handleDroppedBall,
                 id: index,
                 bricks: bricks,
@@ -94,7 +96,7 @@ class Canvas extends React.Component<CanvasProps, CanvasState> {
     }
 
     handleMouseMove = (ev: MouseEvent) => {
-        //console.log(ev.clientX);
+        // console.log(ev.clientX);
         let { paddleXPos } = this.state;
         paddleXPos = ev.clientX;
         this.setState({ paddleXPos });
@@ -125,7 +127,7 @@ class Canvas extends React.Component<CanvasProps, CanvasState> {
         const { paddleXPos, balls, bricks } = this.state;
         return (
             <svg viewBox="0 0 1000 800" xmlns="http://www.w3.org/2000/svg">
-                <Paddle xPos={paddleXPos} width={this.paddleWidth} height={this.paddleHeight}></Paddle>
+                <Paddle xPos={paddleXPos} yPos={this.paddleYPos} width={this.paddleWidth} height={this.paddleHeight}></Paddle>
                 {balls.map(b => <Ball key={b.id} {...b} paddleXPos={paddleXPos} bricks={bricks} brickHit={(brick: BrickProps) => this.handleBrickHit(brick)} />)}
                 {bricks.map(k => <Brick key={k.id} {...k}></Brick>)}
             </svg>);

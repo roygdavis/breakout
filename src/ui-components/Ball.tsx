@@ -8,6 +8,7 @@ export interface BallProps {
     ballGoingLeft: boolean;
     speed: number;
     paddleXPos: number;
+    paddleYPos: number;
     paddleWidth: number;
     paddleHeight: number;
     ballLostEvent: any,
@@ -59,7 +60,7 @@ class Ball extends React.Component<BallProps, BallState> {
 
         this.setState({ xPos, yPos, ballGoingUp, ballGoingLeft });
 
-        if (yPos > 500) this.props.ballLostEvent(this);
+        if (yPos > this.props.paddleYPos) this.props.ballLostEvent(this);
     }
 
     brickHitDetection = () => {
@@ -77,7 +78,8 @@ class Ball extends React.Component<BallProps, BallState> {
     didBallHitPaddle = () => {
         const { xPos, yPos } = this.state;
         const { paddleXPos, paddleWidth } = this.props;
-        if (yPos > 480) {
+        if (yPos > this.props.paddleYPos - 20) {
+            console.log(yPos);
             if (xPos > paddleXPos && xPos < paddleXPos + paddleWidth) {
                 //console.log(`Collision detection - ID = ${this.props.id}\t Ball X = ${xPos}\t Paddle X = ${paddleXPos}`);
                 return true;
