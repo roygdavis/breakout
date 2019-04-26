@@ -17,14 +17,14 @@ export interface CanvasState {
 class Canvas extends React.Component<CanvasProps, CanvasState> {
     initialPaddleXPos = 500;
     numberOfBalls = 10;
-    brickPower = 1;
+    paddleWidth = 150;
+    paddleHeight = 20;
+    brickPower = 1; // alpha
 
     constructor(props: CanvasProps) {
         super(props);
         const bricks = this.generateBricks();
         const balls = this.generateBalls(bricks);
-
-
         this.state = {
             paddleXPos: this.initialPaddleXPos,
             balls: balls,
@@ -52,7 +52,9 @@ class Canvas extends React.Component<CanvasProps, CanvasState> {
                 ballLostEvent: this.handleDroppedBall,
                 id: index,
                 bricks: bricks,
-                brickHit: this.handleBrickHit
+                brickHit: this.handleBrickHit,
+                paddleHeight: this.paddleHeight,
+                paddleWidth: this.paddleWidth
             });
         }
         return balls;
@@ -123,7 +125,7 @@ class Canvas extends React.Component<CanvasProps, CanvasState> {
         const { paddleXPos, balls, bricks } = this.state;
         return (
             <svg viewBox="0 0 1000 800" xmlns="http://www.w3.org/2000/svg">
-                <Paddle xPos={paddleXPos}></Paddle>
+                <Paddle xPos={paddleXPos} width={this.paddleWidth} height={this.paddleHeight}></Paddle>
                 {balls.map(b => <Ball key={b.id} {...b} paddleXPos={paddleXPos} bricks={bricks} brickHit={(brick: BrickProps) => this.handleBrickHit(brick)} />)}
                 {bricks.map(k => <Brick key={k.id} {...k}></Brick>)}
             </svg>);

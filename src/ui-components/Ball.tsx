@@ -8,6 +8,8 @@ export interface BallProps {
     ballGoingLeft: boolean;
     speed: number;
     paddleXPos: number;
+    paddleWidth: number;
+    paddleHeight: number;
     ballLostEvent: any,
     bricks: Array<BrickProps>,
     brickHit: any,
@@ -40,16 +42,14 @@ class Ball extends React.Component<BallProps, BallState> {
 
     moveBall = () => {
         let { xPos, yPos, ballGoingUp, ballGoingLeft } = this.state;
-        let ballLost = false;
+
         // set this ball position
         if (xPos > 1000) ballGoingLeft = true;
         if (xPos < 0) ballGoingLeft = false;
         if (yPos < 0) ballGoingUp = false;
-        if (yPos > 480) {
-            ballLost = !this.didBallHitPaddle();
-            ballGoingUp = !ballLost;
-        }
-        if (yPos < 100) {
+        if (!ballGoingUp && this.didBallHitPaddle()) ballGoingUp = true;
+
+        if (yPos < 110) {
             const hit = this.brickHitDetection();
             if (hit) ballGoingUp = !ballGoingUp;
         }
@@ -59,11 +59,11 @@ class Ball extends React.Component<BallProps, BallState> {
 
         this.setState({ xPos, yPos, ballGoingUp, ballGoingLeft });
 
-        if (ballLost) this.props.ballLostEvent(this);
+        if (yPos > 500) this.props.ballLostEvent(this);
     }
 
     brickHitDetection = () => {
-        let { xPos, yPos, ballGoingUp } = this.state;
+        let { xPos, yPos } = this.state;
         for (let index = 0; index < this.props.bricks.length; index++) {
             const element = this.props.bricks[index];
             if ((yPos < element.yPos && yPos > element.yPos - 20) && (xPos > element.xPos && xPos < element.xPos + 100)) {
@@ -75,15 +75,15 @@ class Ball extends React.Component<BallProps, BallState> {
     }
 
     didBallHitPaddle = () => {
-        const { xPos } = this.state;
-        const { paddleXPos } = this.props;
-        if (xPos > (paddleXPos - 50) && xPos < (paddleXPos + 50)) {
-            //console.log(`Collision detection - ID = ${this.props.id}\t Ball X = ${xPos}\t Paddle X = ${paddleXPos}`);
-            return true;
+        const { xPos, yPos } = this.state;
+        const { paddleXPos, paddleWidth } = this.props;
+        if (yPos > 480) {
+            if (xPos > paddleXPos && xPos < paddleXPos + paddleWidth) {
+                //console.log(`Collision detection - ID = ${this.props.id}\t Ball X = ${xPos}\t Paddle X = ${paddleXPos}`);
+                return true;
+            }
         }
-        else {
-            return false;
-        }
+        return false;
     }
 
     render() {
