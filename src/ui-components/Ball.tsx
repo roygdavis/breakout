@@ -66,7 +66,7 @@ class Ball extends React.Component<BallProps, BallState> {
         let { xPos, yPos } = this.state;
         for (let index = 0; index < this.props.bricks.length; index++) {
             const element = this.props.bricks[index];
-            if ((yPos < element.yPos && yPos > element.yPos - 20) && (xPos > element.xPos && xPos < element.xPos + 100)) {
+            if ((yPos >= element.yPos && yPos <= element.yPos + 20) && (xPos >= element.xPos && xPos <= element.xPos + 100)) {
                 this.props.brickHit(element);
                 return true;
             }

@@ -16,7 +16,7 @@ export interface CanvasState {
 
 class Canvas extends React.Component<CanvasProps, CanvasState> {
     initialPaddleXPos = 500;
-    numberOfBalls = 10;
+    numberOfBalls = 50;
     paddleWidth = 150;
     paddleHeight = 20;
     brickPower = 1; // alpha
@@ -112,7 +112,7 @@ class Canvas extends React.Component<CanvasProps, CanvasState> {
         const b = bricks.find(b => b.id === brick.id);
         b!.power -= 0.2;
         if (b!.power < 0) b!.power = 0;
-        this.setState({ bricks });
+        this.setState({ bricks: bricks.filter(br => br.power !== 0) });
     }
 
     gameOver = () => {
