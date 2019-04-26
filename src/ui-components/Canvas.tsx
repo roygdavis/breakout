@@ -2,7 +2,6 @@ import * as React from 'react';
 import Paddle from './Paddle';
 import Ball, { BallProps } from './Ball';
 import Brick, { BrickProps } from './Brick';
-import { array } from 'prop-types';
 
 export interface CanvasProps {
 }
@@ -18,12 +17,13 @@ export interface CanvasState {
 class Canvas extends React.Component<CanvasProps, CanvasState> {
     initialPaddleXPos = 500;
     numberOfBalls = 10;
-    brickPower = 10;
+    brickPower = 1;
 
     constructor(props: CanvasProps) {
         super(props);
-        const balls = this.generateBalls();
-        const bricks = this.generateBricks(balls);
+        const bricks = this.generateBricks();
+        const balls = this.generateBalls(bricks);
+
 
         this.state = {
             paddleXPos: this.initialPaddleXPos,
@@ -39,7 +39,7 @@ class Canvas extends React.Component<CanvasProps, CanvasState> {
         window.onmousemove = this.handleMouseMove;
     }
 
-    generateBalls = () => {
+    generateBalls = (bricks: Array<BrickProps>) => {
         let balls = new Array<BallProps>();
         for (let index = 0; index < this.numberOfBalls; index++) {
             balls.push({
@@ -50,22 +50,23 @@ class Canvas extends React.Component<CanvasProps, CanvasState> {
                 speed: Math.random() * 100,
                 paddleXPos: this.initialPaddleXPos,
                 ballLostEvent: this.handleDroppedBall,
-                id: index
+                id: index,
+                bricks: bricks,
+                brickHit: this.handleBrickHit
             });
         }
         return balls;
     }
 
-    generateBricks = (balls: Array<BallProps>) => {
+    generateBricks = () => {
         let bricks = new Array<BrickProps>();
         let id = 0;
-        for (let y = 0; y < 100; y += 5) {
+        for (let y = 0; y < 100; y += 20) {
             for (let x = 0; x < 1000; x += 100) {
                 bricks.push({
                     xPos: x,
                     yPos: y,
                     power: this.brickPower,
-                    balls: balls,
                     id: id
                 });
                 id++;
@@ -103,6 +104,15 @@ class Canvas extends React.Component<CanvasProps, CanvasState> {
         this.setState({ balls: balls.filter(f => f.id !== ball.props.id) });
     }
 
+    handleBrickHit = (brick: BrickProps) => {
+        //console.log(brick);
+        const { bricks } = this.state;
+        const b = bricks.find(b => b.id === brick.id);
+        b!.power -= 0.2;
+        if (b!.power < 0) b!.power = 0;
+        this.setState({ bricks });
+    }
+
     gameOver = () => {
         const { intervalId } = this.state;
         console.log("Gameover");
@@ -114,7 +124,7 @@ class Canvas extends React.Component<CanvasProps, CanvasState> {
         return (
             <svg viewBox="0 0 1000 800" xmlns="http://www.w3.org/2000/svg">
                 <Paddle xPos={paddleXPos}></Paddle>
-                {balls.map(b => <Ball key={b.id} {...b} paddleXPos={paddleXPos} />)}
+                {balls.map(b => <Ball key={b.id} {...b} paddleXPos={paddleXPos} bricks={bricks} brickHit={(brick: BrickProps) => this.handleBrickHit(brick)} />)}
                 {bricks.map(k => <Brick key={k.id} {...k}></Brick>)}
             </svg>);
     }
